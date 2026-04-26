@@ -58,3 +58,14 @@ target/
 minikube-linux-amd64
 
 backup_jenkins_home/
+
+target/
+*.log
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
