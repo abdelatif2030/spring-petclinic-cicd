@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "abdelatif2030/spring-petclinic"
+        IMAGE_NAME = "abdo1997mohamed2030/spring-petclinic"
         CONTAINER_NAME = "spring-app"
         PORT = "8083"
     }
