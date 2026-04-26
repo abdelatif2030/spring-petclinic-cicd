@@ -1,5 +1,4 @@
-apiVersion: v1
-kind: Secret
+
 metadata:
   name: petclinic-db-secret
 type: Opaque
@@ -55,3 +54,4 @@ spec:
                   key: database
           ports:
             - containerPort: 5432
+

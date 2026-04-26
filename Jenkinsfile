@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "abdo1997mohamed2030/spring-petclinic"
-        CONTAINER_NAME = "spring-app"
-        PORT = "8083"
     }
 
     stages {
@@ -23,44 +21,37 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh """
-                docker build -t $IMAGE_NAME:latest .
-                """
+                sh 'docker build -t $IMAGE_NAME:latest .'
             }
         }
 
-        stage('Docker Login & Push') {
+        stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-                    sh """
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
                     echo $PASS | docker login -u $USER --password-stdin
                     docker push $IMAGE_NAME:latest
-                    """
+                    '''
                 }
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh """
-                docker rm -f $CONTAINER_NAME || true
-                docker run -d --name $CONTAINER_NAME -p $PORT:8080 $IMAGE_NAME:latest
-                """
+                sh '''
+                kubectl apply -f k8s/db.yml
+                kubectl apply -f k8s/petclinic.yml
+                '''
             }
         }
     }
 
     post {
         success {
-            echo "✅ Pipeline completed successfully!"
+            echo '✅ Deployment to Kubernetes successful!'
         }
-
         failure {
-            echo "❌ Pipeline failed. Check logs."
+            echo '❌ Pipeline failed.'
         }
     }
 }
