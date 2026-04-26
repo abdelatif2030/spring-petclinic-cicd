@@ -36,15 +36,6 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh '''
-                kubectl apply -f k8s/db.yml
-                kubectl apply -f k8s/petclinic.yml
-                '''
-            }
-        }
-    }
 
     post {
         success {

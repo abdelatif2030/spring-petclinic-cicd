@@ -56,3 +56,5 @@ target/
 .aws/
 *.zip
 minikube-linux-amd64
+
+backup_jenkins_home/
