@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "abdelatif2030/spring-petclinic"
+        CONTAINER_NAME = "spring-app"
+        PORT = "8083"
+    }
+
     stages {
 
         stage('Checkout') {
@@ -17,28 +23,44 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t abdelatif2030/spring-petclinic:latest .'
+                sh """
+                docker build -t $IMAGE_NAME:latest .
+                """
             }
         }
 
-        stage('Push to DockerHub') {
+        stage('Docker Login & Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh """
                     echo $PASS | docker login -u $USER --password-stdin
-                    docker push abdelatif2030/spring-petclinic:latest
-                    '''
+                    docker push $IMAGE_NAME:latest
+                    """
                 }
             }
         }
 
         stage('Run Container') {
             steps {
-                sh '''
-                docker rm -f spring-app || true
-                docker run -d --name spring-app -p 8083:8080 abdelatif2030/spring-petclinic:latest
-                '''
+                sh """
+                docker rm -f $CONTAINER_NAME || true
+                docker run -d --name $CONTAINER_NAME -p $PORT:8080 $IMAGE_NAME:latest
+                """
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+
+        failure {
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }
