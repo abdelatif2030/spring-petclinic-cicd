@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: spring-petclinic:local
+          image:  abdelatif2030/spring-petclinic:latest
           ports:
             - containerPort: 8080
           env:
